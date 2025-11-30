@@ -20,13 +20,13 @@
         enabled: yes
     - name: Pull ToDo app image from Docker Hub
       docker_image:
-        name: 7974693842/todo_main
+        name: 7974693842/todo_main:latest
         source: pull
 
     - name: Run ToDo app container with Gunicorn
       docker_container:
         name: todo_app
-        image: 7974693842/todo_main
+        image: 7974693842/todo_main:latest
         state: started
         recreate: yes
         restart_policy: always
