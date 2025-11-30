@@ -38,7 +38,8 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t 7974693842/todo_main:latest .
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/todo_main:latest .
+
 
       - name: Login to Docker Hub
         run: |
@@ -47,8 +48,7 @@ jobs:
 
       - name: Push Docker image to Docker Hub
         run: |
-          docker push 7974693842/todo_main:latest
-
+          docker push ${{ secrets.DOCKER_USERNAME }}/todo_main:latest
 
       - name: Setup SSH key for Ansible
         run: |
