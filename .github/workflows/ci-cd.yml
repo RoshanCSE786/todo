@@ -37,7 +37,7 @@ jobs:
         run: python manage.py collectstatic --noinput
 
       - name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/todo_main:latest .
+        run: docker build --no-cache -t ${{ secrets.DOCKER_USERNAME }}/todo_main:latest .
 
 
       - name: Login to Docker Hub
@@ -46,6 +46,8 @@ jobs:
 
 
       - name: Push Docker image to DockerHub
+        env:
+          DOCKER_CLI_EXPERIMENTAL: enabled
         run: docker push ${{ secrets.DOCKER_USERNAME }}/todo_main:latest
 
       - name: Setup SSH key for Ansible
