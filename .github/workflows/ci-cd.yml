@@ -36,6 +36,19 @@ jobs:
       - name: Build static files
         run: python manage.py collectstatic --noinput
 
+      - name: Build Docker image
+        run: |
+          docker build -t 7974693842/todo_main:latest .
+
+      - name: Login to Docker Hub
+        run: |
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Push Docker image to Docker Hub
+        run: |
+          docker push 7974693842/todo_main:latest
+
+
       - name: Setup SSH key for Ansible
         run: |
           mkdir -p ~/.ssh
