@@ -1,0 +1,76 @@
+- name: Deploy Django ToDo app with Docker, Gunicorn, and Nginx
+  hosts: todo_servers
+  become: yes
+
+  tasks:
+
+  - name: Update apt and install dependencies
+    apt:
+      update_cache: yes
+      name:
+        - docker.io
+        - docker-compose
+        - nginx
+        - python3-pip
+      state: present
+
+  - name: Start and enable Docker service
+    systemd:
+      name: docker
+      state: started
+      enabled: yes
+  - name: Pull ToDo app image from Docker Hub
+    docker_image:
+      name: 7974693842/todo_main
+      source: pull
+
+  - name: Run ToDo app container with Gunicorn
+    docker_container:
+      name: todo_app
+      image: 7974693842/todo_main
+      state: started
+      recreate: yes
+      restart_policy: always
+      ports:
+        - "8000:8000"
+      command: >
+        gunicorn todo_main.wsgi:application
+        --bind 0.0.0.0:8000
+
+  
+  - name: Configure Nginx for ToDo app
+    copy:
+      dest: /etc/nginx/sites-available/todo_app
+      content: |
+        server {
+            listen 80;
+            server_name rostodo.ddns.net;
+
+            location / {
+                proxy_pass http://127.0.0.1:8000;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+            }
+        }
+    notify: Reload nginx
+  
+  - name: Enable Nginx site
+    file:
+      src: /etc/nginx/sites-available/todo_app
+      dest: /etc/nginx/sites-enabled/todo_app
+      state: link
+      force: yes
+
+  - name: Remove default Nginx site
+    file:
+      path: /etc/nginx/sites-enabled/default
+      state: absent
+    notify: Reload nginx
+
+  handlers:
+    - name: Reload nginx
+      systemd:
+        name: nginx
+        state: restarted
