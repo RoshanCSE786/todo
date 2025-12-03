@@ -10,6 +10,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Step 4: Copy whole project
 COPY . .
+COPY todo_main/static/ todo_main/static/
 # COPY static/ static/
 
 # Step 5: Collect static files
