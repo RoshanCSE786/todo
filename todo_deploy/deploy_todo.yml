@@ -19,10 +19,11 @@
         state: started
         enabled: yes
 
-    - name: Pull ToDo app image from Docker Hub
+    - name: Always Pull latest ToDo app image from Docker Hub
       docker_image:
         name: 7974693842/todo_main:latest
         source: pull
+        force_source: true
 
     - name: Ensure staticfiles directory exists on host
       file:
@@ -38,6 +39,7 @@
         image: 7974693842/todo_main:latest
         state: started
         recreate: yes
+        pull: true
         restart_policy: always
         ports:
           - "8000:8000"
